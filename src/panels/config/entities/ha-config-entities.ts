@@ -114,6 +114,8 @@ import { isHelperDomain } from "../helpers/const";
 import "../integrations/ha-integration-overflow-menu";
 import { showAddIntegrationDialog } from "../integrations/show-add-integration-dialog";
 import { showLabelDetailDialog } from "../labels/show-dialog-label-detail";
+import { voiceAssistants } from "../../../data/expose";
+import { brandsUrl } from "../../../util/brands-url";
 
 export interface StateEntity
   extends Omit<EntityRegistryEntry, "id" | "unique_id"> {
@@ -362,6 +364,36 @@ export class HaConfigEntities extends SubscribeMixin(LitElement) {
         hidden: true,
         filterable: true,
         groupable: true,
+      },
+      voice_assistants: {
+        title: localize(
+          "ui.panel.config.entities.picker.headers.voice_assistants"
+        ),
+        type: "icon",
+        showNarrow: true,
+        sortable: true,
+        filterable: true,
+        template: (entry) =>
+          html` ${Object.keys(voiceAssistants).filter(
+            (vaKey) => entry.options?.[vaKey]?.should_expose
+          ).length !== 0
+            ? Object.keys(voiceAssistants)
+                .filter((vaKey) => entry.options?.[vaKey]?.should_expose)
+                .map(
+                  (vaKey) =>
+                    html`<img
+                      alt=""
+                      src=${brandsUrl({
+                        domain: voiceAssistants[vaKey].domain,
+                        type: "icon",
+                        darkOptimized: this.hass.themes?.darkMode,
+                      })}
+                      crossorigin="anonymous"
+                      referrerpolicy="no-referrer"
+                      slot="prefix"
+                    />`
+                )
+            : "—"}`,
       },
       disabled_by: {
         title: localize("ui.panel.config.entities.picker.headers.disabled_by"),

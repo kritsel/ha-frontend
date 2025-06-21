@@ -317,6 +317,43 @@ class HaAutomationPicker extends SubscribeMixin(LitElement) {
           template: (automation) =>
             automation.labels.map((lbl) => lbl.name).join(" "),
         },
+        voice_assistants: {
+          title: localize(
+            "ui.panel.config.automation.picker.headers.voice_assistants"
+          ),
+          type: "icon",
+          showNarrow: true,
+          sortable: true,
+          filterable: true,
+          // template: (automation) => {
+          // TODO: problem is that automation.options does not exist,
+          // TODO: remove logging when it works
+          // console.log(automation.name)
+          // console.log(automation)
+          // return html` ${
+          // 'hello'
+          // Object.keys(voiceAssistants)
+          //   .filter(vaKey => automation.options?.[vaKey]?.should_expose)
+          //   .length !== 0
+          //     ? Object.keys(voiceAssistants)
+          //         .filter(vaKey => automation.options?.[vaKey]?.should_expose)
+          //         .map( (vaKey) => {
+          //           return html`<img
+          //             alt=""
+          //             src=${brandsUrl({
+          //               domain: voiceAssistants[vaKey].domain,
+          //               type: "icon",
+          //               darkOptimized: this.hass.themes?.darkMode,
+          //             })}
+          //             crossorigin="anonymous"
+          //             referrerpolicy="no-referrer"
+          //             slot="prefix"
+          //           />`
+          //           })
+          //     : "—"
+          // }`
+          // }
+        },
         last_triggered: {
           sortable: true,
           title: localize("ui.card.automation.last_triggered"),

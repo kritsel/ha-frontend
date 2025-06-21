@@ -346,6 +346,43 @@ export class HaConfigHelpers extends SubscribeMixin(LitElement) {
         filterable: true,
         groupable: true,
       },
+      voice_assistants: {
+        title: localize(
+          "ui.panel.config.helpers.picker.headers.voice_assistants"
+        ),
+        type: "icon",
+        showNarrow: true,
+        sortable: true,
+        filterable: true,
+        // template: (helper) => {
+        // TODO: remove logging once it all works
+        // TODO: helper.options does not exists
+        // console.log(helper.name)
+        // console.log(helper)
+        // return 'hello'
+        // html` ${
+        //   Object.keys(voiceAssistants)
+        //     .filter(vaKey => helper.options?.[vaKey]?.should_expose)
+        //     .length !== 0
+        //       ? Object.keys(voiceAssistants)
+        //           .filter(vaKey => helper.options?.[vaKey]?.should_expose)
+        //           .map( (vaKey) => {
+        //             return html`<img
+        //               alt=""
+        //               src=${brandsUrl({
+        //                 domain: voiceAssistants[vaKey].domain,
+        //                 type: "icon",
+        //                 darkOptimized: this.hass.themes?.darkMode,
+        //               })}
+        //               crossorigin="anonymous"
+        //               referrerpolicy="no-referrer"
+        //               slot="prefix"
+        //             />`
+        //             })
+        //       : "—"
+        // }`
+        // }
+      },
       editable: {
         title: localize("ui.panel.config.helpers.picker.headers.editable"),
         type: "icon",

@@ -108,6 +108,8 @@ import { showAssignCategoryDialog } from "../category/show-dialog-assign-categor
 import { showCategoryRegistryDetailDialog } from "../category/show-dialog-category-registry-detail";
 import { configSections } from "../ha-panel-config";
 import { showLabelDetailDialog } from "../labels/show-dialog-label-detail";
+import { voiceAssistants } from "../../../data/expose";
+import { brandsUrl } from "../../../util/brands-url";
 
 type ScriptItem = ScriptEntity & {
   name: string;
@@ -297,6 +299,45 @@ class HaScriptPicker extends SubscribeMixin(LitElement) {
           hidden: true,
           filterable: true,
           template: (script) => script.labels.map((lbl) => lbl.name).join(" "),
+        },
+        voice_assistants: {
+          title: localize(
+            "ui.panel.config.scene.picker.headers.voice_assistants"
+          ),
+          type: "icon",
+          showNarrow: true,
+          sortable: true,
+          filterable: true,
+          template: (script) =>
+            // TODO: problem is that script.options is always null,
+            //   while the options part knows to which voice assistant the helper is exposed to
+            //   how to get access to an extended script object which carries the 'options' property?
+            // code below doesn't work ('await 'expressions are only allowed within async functions and at the top levels of modules)
+            // const entry = await getExtendedEntityRegistryEntry(this.hass, script.entity_id)
+            // TODO: remove logging when it works
+            // TODO: problem is that script.options is always null
+            // console.log(script.name)
+            // console.log(script)
+            html` ${Object.keys(voiceAssistants).filter(
+              (vaKey) => script.options?.[vaKey]?.should_expose
+            ).length !== 0
+              ? Object.keys(voiceAssistants)
+                  .filter((vaKey) => script.options?.[vaKey]?.should_expose)
+                  .map(
+                    (vaKey) =>
+                      html`<img
+                        alt=""
+                        src=${brandsUrl({
+                          domain: voiceAssistants[vaKey].domain,
+                          type: "icon",
+                          darkOptimized: this.hass.themes?.darkMode,
+                        })}
+                        crossorigin="anonymous"
+                        referrerpolicy="no-referrer"
+                        slot="prefix"
+                      />`
+                  )
+              : "—"}`,
         },
         last_triggered: {
           sortable: true,

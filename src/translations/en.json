@@ -3057,7 +3057,8 @@
               "entity_id": "Entity ID",
               "type": "Type",
               "editable": "Editable",
-              "category": "Category"
+              "category": "Category",
+              "voice_assistants": "[%key:ui::panel::config::dashboard::voice_assistants::main%]"
             },
             "create_helper": "Create helper",
             "no_helpers": "Looks like you don't have any helpers yet!",
@@ -3634,7 +3635,8 @@
               "state": "State",
               "category": "Category",
               "area": "Area",
-              "icon": "Icon"
+              "icon": "Icon",
+              "voice_assistants": "[%key:ui::panel::config::dashboard::voice_assistants::main%]"
             },
             "bulk_action": "Action",
             "bulk_actions": {
@@ -4550,7 +4552,8 @@
               "state": "State",
               "category": "Category",
               "area": "Area",
-              "icon": "Icon"
+              "icon": "Icon",
+              "voice_assistants": "[%key:ui::panel::config::dashboard::voice_assistants::main%]"
             },
             "edit_category": "[%key:ui::panel::config::automation::picker::edit_category%]",
             "assign_category": "[%key:ui::panel::config::automation::picker::assign_category%]",
@@ -4679,7 +4682,8 @@
               "category": "Category",
               "editable": "[%key:ui::panel::config::helpers::picker::headers::editable%]",
               "area": "Area",
-              "icon": "Icon"
+              "icon": "Icon",
+              "voice_assistants": "[%key:ui::panel::config::dashboard::voice_assistants::main%]"
             },
             "edit_category": "[%key:ui::panel::config::automation::picker::edit_category%]",
             "assign_category": "[%key:ui::panel::config::automation::picker::assign_category%]",
@@ -5116,6 +5120,7 @@
               "disabled_by": "Disabled by",
               "status": "Status",
               "domain": "Domain",
+              "voice_assistants": "[%key:ui::panel::config::dashboard::voice_assistants::main%]",
               "availability": "Availability",
               "visibility": "Visibility",
               "enabled": "Enabled"

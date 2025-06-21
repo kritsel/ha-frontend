@@ -287,6 +287,43 @@ class HaSceneDashboard extends SubscribeMixin(LitElement) {
           filterable: true,
           template: (scene) => scene.labels.map((lbl) => lbl.name).join(" "),
         },
+        voice_assistants: {
+          title: localize(
+            "ui.panel.config.scene.picker.headers.voice_assistants"
+          ),
+          type: "icon",
+          showNarrow: true,
+          sortable: true,
+          filterable: true,
+          // template: (scene) => {
+          // TODO: problem is that scene.options does not exist,
+          // TODO: remove logging when it works
+          // console.log(scene.name)
+          // console.log(scene)
+          // return html` ${
+          //   'hello'
+          // Object.keys(voiceAssistants)
+          //   .filter(vaKey => scene.options?.[vaKey]?.should_expose)
+          //   .length !== 0
+          //     ? Object.keys(voiceAssistants)
+          //         .filter(vaKey => scene.options?.[vaKey]?.should_expose)
+          //         .map( (vaKey) => {
+          //           return html`<img
+          //             alt=""
+          //             src=${brandsUrl({
+          //               domain: voiceAssistants[vaKey].domain,
+          //               type: "icon",
+          //               darkOptimized: this.hass.themes?.darkMode,
+          //             })}
+          //             crossorigin="anonymous"
+          //             referrerpolicy="no-referrer"
+          //             slot="prefix"
+          //           />`
+          //           })
+          //     : "—"
+          // }`
+          // }
+        },
         state: {
           title: localize(
             "ui.panel.config.scene.picker.headers.last_activated"
