@@ -3058,7 +3058,7 @@
               "type": "Type",
               "editable": "Editable",
               "category": "Category",
-              "voice_assistants": "[%key:ui::panel::config::dashboard::voice_assistants::main%]"
+              "voice_assistants": "Voice assistants"
             },
             "create_helper": "Create helper",
             "no_helpers": "Looks like you don't have any helpers yet!",
@@ -3636,7 +3636,7 @@
               "category": "Category",
               "area": "Area",
               "icon": "Icon",
-              "voice_assistants": "[%key:ui::panel::config::dashboard::voice_assistants::main%]"
+              "voice_assistants": "Voice assistants"
             },
             "bulk_action": "Action",
             "bulk_actions": {
@@ -4553,7 +4553,7 @@
               "category": "Category",
               "area": "Area",
               "icon": "Icon",
-              "voice_assistants": "[%key:ui::panel::config::dashboard::voice_assistants::main%]"
+              "voice_assistants": "Voice assistants"
             },
             "edit_category": "[%key:ui::panel::config::automation::picker::edit_category%]",
             "assign_category": "[%key:ui::panel::config::automation::picker::assign_category%]",
@@ -4683,7 +4683,7 @@
               "editable": "[%key:ui::panel::config::helpers::picker::headers::editable%]",
               "area": "Area",
               "icon": "Icon",
-              "voice_assistants": "[%key:ui::panel::config::dashboard::voice_assistants::main%]"
+              "voice_assistants": "Voice assistants"
             },
             "edit_category": "[%key:ui::panel::config::automation::picker::edit_category%]",
             "assign_category": "[%key:ui::panel::config::automation::picker::assign_category%]",
@@ -5120,7 +5120,7 @@
               "disabled_by": "Disabled by",
               "status": "Status",
               "domain": "Domain",
-              "voice_assistants": "[%key:ui::panel::config::dashboard::voice_assistants::main%]",
+              "voice_assistants": "Voice assistants",
               "availability": "Availability",
               "visibility": "Visibility",
               "enabled": "Enabled"

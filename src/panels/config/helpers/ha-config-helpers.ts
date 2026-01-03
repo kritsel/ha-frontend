@@ -109,6 +109,8 @@ import { renderConfigEntryError } from "../integrations/ha-config-integration-pa
 import { showLabelDetailDialog } from "../labels/show-dialog-label-detail";
 import { isHelperDomain } from "./const";
 import { showHelperDetailDialog } from "./show-dialog-helper-detail";
+import { voiceAssistants } from "../../../data/expose";
+import { brandsUrl } from "../../../util/brands-url";
 
 interface HelperItem {
   id: string;
@@ -354,34 +356,33 @@ export class HaConfigHelpers extends SubscribeMixin(LitElement) {
         showNarrow: true,
         sortable: true,
         filterable: true,
-        // template: (helper) => {
-        // TODO: remove logging once it all works
-        // TODO: helper.options does not exists
-        // console.log(helper.name)
-        // console.log(helper)
-        // return 'hello'
-        // html` ${
-        //   Object.keys(voiceAssistants)
-        //     .filter(vaKey => helper.options?.[vaKey]?.should_expose)
-        //     .length !== 0
-        //       ? Object.keys(voiceAssistants)
-        //           .filter(vaKey => helper.options?.[vaKey]?.should_expose)
-        //           .map( (vaKey) => {
-        //             return html`<img
-        //               alt=""
-        //               src=${brandsUrl({
-        //                 domain: voiceAssistants[vaKey].domain,
-        //                 type: "icon",
-        //                 darkOptimized: this.hass.themes?.darkMode,
-        //               })}
-        //               crossorigin="anonymous"
-        //               referrerpolicy="no-referrer"
-        //               slot="prefix"
-        //             />`
-        //             })
-        //       : "—"
-        // }`
-        // }
+        template: (helper) => {
+          const entityRegEntry = this._entityReg.find(
+            (reg) => reg.entity_id === helper.entity_id
+          );
+          return html` ${Object.keys(voiceAssistants).filter(
+            (vaKey) => entityRegEntry?.options?.[vaKey]?.should_expose
+          ).length !== 0
+            ? Object.keys(voiceAssistants)
+                .filter(
+                  (vaKey) => entityRegEntry?.options?.[vaKey]?.should_expose
+                )
+                .map(
+                  (vaKey) =>
+                    html`<img
+                      alt=""
+                      src=${brandsUrl({
+                        domain: voiceAssistants[vaKey].domain,
+                        type: "icon",
+                        darkOptimized: this.hass.themes?.darkMode,
+                      })}
+                      crossorigin="anonymous"
+                      referrerpolicy="no-referrer"
+                      slot="prefix"
+                    />`
+                )
+            : "—"}`;
+        },
       },
       editable: {
         title: localize("ui.panel.config.helpers.picker.headers.editable"),

@@ -112,6 +112,8 @@ import { showCategoryRegistryDetailDialog } from "../category/show-dialog-catego
 import { configSections } from "../ha-panel-config";
 import { showLabelDetailDialog } from "../labels/show-dialog-label-detail";
 import { showNewAutomationDialog } from "./show-dialog-new-automation";
+import { voiceAssistants } from "../../../data/expose";
+import { brandsUrl } from "../../../util/brands-url";
 
 type AutomationItem = AutomationEntity & {
   name: string;
@@ -325,34 +327,33 @@ class HaAutomationPicker extends SubscribeMixin(LitElement) {
           showNarrow: true,
           sortable: true,
           filterable: true,
-          // template: (automation) => {
-          // TODO: problem is that automation.options does not exist,
-          // TODO: remove logging when it works
-          // console.log(automation.name)
-          // console.log(automation)
-          // return html` ${
-          // 'hello'
-          // Object.keys(voiceAssistants)
-          //   .filter(vaKey => automation.options?.[vaKey]?.should_expose)
-          //   .length !== 0
-          //     ? Object.keys(voiceAssistants)
-          //         .filter(vaKey => automation.options?.[vaKey]?.should_expose)
-          //         .map( (vaKey) => {
-          //           return html`<img
-          //             alt=""
-          //             src=${brandsUrl({
-          //               domain: voiceAssistants[vaKey].domain,
-          //               type: "icon",
-          //               darkOptimized: this.hass.themes?.darkMode,
-          //             })}
-          //             crossorigin="anonymous"
-          //             referrerpolicy="no-referrer"
-          //             slot="prefix"
-          //           />`
-          //           })
-          //     : "—"
-          // }`
-          // }
+          template: (automation) => {
+            const entityRegEntry = this._entityReg.find(
+              (reg) => reg.entity_id === automation.entity_id
+            );
+            return html` ${Object.keys(voiceAssistants).filter(
+              (vaKey) => entityRegEntry?.options?.[vaKey]?.should_expose
+            ).length !== 0
+              ? Object.keys(voiceAssistants)
+                  .filter(
+                    (vaKey) => entityRegEntry?.options?.[vaKey]?.should_expose
+                  )
+                  .map(
+                    (vaKey) =>
+                      html`<img
+                        alt=""
+                        src=${brandsUrl({
+                          domain: voiceAssistants[vaKey].domain,
+                          type: "icon",
+                          darkOptimized: this.hass.themes?.darkMode,
+                        })}
+                        crossorigin="anonymous"
+                        referrerpolicy="no-referrer"
+                        slot="prefix"
+                      />`
+                  )
+              : "—"}`;
+          },
         },
         last_triggered: {
           sortable: true,

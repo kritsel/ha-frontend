@@ -302,27 +302,23 @@ class HaScriptPicker extends SubscribeMixin(LitElement) {
         },
         voice_assistants: {
           title: localize(
-            "ui.panel.config.scene.picker.headers.voice_assistants"
+            "ui.panel.config.script.picker.headers.voice_assistants"
           ),
           type: "icon",
           showNarrow: true,
           sortable: true,
           filterable: true,
-          template: (script) =>
-            // TODO: problem is that script.options is always null,
-            //   while the options part knows to which voice assistant the helper is exposed to
-            //   how to get access to an extended script object which carries the 'options' property?
-            // code below doesn't work ('await 'expressions are only allowed within async functions and at the top levels of modules)
-            // const entry = await getExtendedEntityRegistryEntry(this.hass, script.entity_id)
-            // TODO: remove logging when it works
-            // TODO: problem is that script.options is always null
-            // console.log(script.name)
-            // console.log(script)
-            html` ${Object.keys(voiceAssistants).filter(
-              (vaKey) => script.options?.[vaKey]?.should_expose
+          template: (script) => {
+            const entityRegEntry = this._entityReg.find(
+              (reg) => reg.entity_id === script.entity_id
+            );
+            return html` ${Object.keys(voiceAssistants).filter(
+              (vaKey) => entityRegEntry?.options?.[vaKey]?.should_expose
             ).length !== 0
               ? Object.keys(voiceAssistants)
-                  .filter((vaKey) => script.options?.[vaKey]?.should_expose)
+                  .filter(
+                    (vaKey) => entityRegEntry?.options?.[vaKey]?.should_expose
+                  )
                   .map(
                     (vaKey) =>
                       html`<img
@@ -337,7 +333,8 @@ class HaScriptPicker extends SubscribeMixin(LitElement) {
                         slot="prefix"
                       />`
                   )
-              : "—"}`,
+              : "—"}`;
+          },
         },
         last_triggered: {
           sortable: true,
