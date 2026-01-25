@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { ResizeController } from "@lit-labs/observers/resize-controller";
 import { consume } from "@lit/context";
 import {
@@ -75,7 +74,7 @@ import {
 import { getConfigFlowHandlers } from "../../../data/config_flow";
 import { fullEntitiesContext } from "../../../data/context";
 import {
-  isUsedFilter2,
+  isFilterValueUsed,
   type DataTableFiltersItems,
   type DataTableFiltersValues,
 } from "../../../data/data_table_filters";
@@ -961,37 +960,38 @@ export class HaConfigHelpers extends SubscribeMixin(LitElement) {
   }
 
   private _applyFilters() {
-    const filters = Object.entries(this._filters);
+    let filteredEntityIds: string[] | undefined;
 
-    // let items: Set<string> | undefined;
+    // first process all filters that apply the selected filter values
+    // themselves, and respond with the helper entityIds that match
+    Object.values(this._filteredItems).forEach((itms) => {
+      if (itms) {
+        if (!filteredEntityIds) {
+          filteredEntityIds = Array.from(itms.values());
+        } else {
+          filteredEntityIds = filteredEntityIds.filter((entityId) =>
+            itms!.has(entityId)
+          );
+        }
+      }
+    });
 
-    // start with ALL items
+    // when none of those filters were used, then initalize the filter result
+    // with all helper entityIds
     const helperEntityIds = this._helperEntities.map(
       (helper) => helper.entity_id
     );
     const disabledEntityIds = this._disabledEntityEntries
       ? this._disabledEntityEntries.map((entry) => entry.entity_id)
       : [];
-    let filteredEntityIds = helperEntityIds.concat(disabledEntityIds);
-
-    console.log("_filteredItems (in _applyFilters)");
-    console.log(this._filteredItems);
-
-    // first process all filters that apply the selected filter values
-    // themselves, and respond with the helper entityIds that match
-    Object.values(this._filteredItems).forEach((itms) => {
-      if (itms) {
-        filteredEntityIds = filteredEntityIds.filter((entityId) =>
-          itms!.has(entityId)
-        );
-      }
-    });
+    filteredEntityIds = helperEntityIds.concat(disabledEntityIds);
 
     // the filters below only expose the selected options (as filter.value);
     // category filter only allows a single selected option
     // applying the filter must be done here
+    const filters = Object.entries(this._filters);
     for (const [key, filterValue] of filters) {
-      if (isUsedFilter2(key, filterValue, "ha-filter-categories")) {
+      if (isFilterValueUsed(key, filterValue, "ha-filter-categories")) {
         // category filter only allows a single selected option
         filteredEntityIds = filteredEntityIds.filter(
           (entityId) =>
@@ -999,14 +999,14 @@ export class HaConfigHelpers extends SubscribeMixin(LitElement) {
             this._entityReg.find((reg) => reg.entity_id === entityId)
               ?.categories.helpers
         );
-      } else if (isUsedFilter2(key, filterValue, "ha-filter-labels")) {
+      } else if (isFilterValueUsed(key, filterValue, "ha-filter-labels")) {
         filteredEntityIds = filteredEntityIds.filter((entityId) =>
           this._entityReg
             .find((reg) => reg.entity_id === entityId)
             ?.labels.some((lbl) => (filterValue as string[]).includes(lbl))
         );
       } else if (
-        isUsedFilter2(key, filterValue, "ha-filter-voice-assistants")
+        isFilterValueUsed(key, filterValue, "ha-filter-voice-assistants")
       ) {
         filteredEntityIds = filteredEntityIds.filter((entityId) =>
           getEntityVoiceAssistantsIds(this._entityReg, entityId).some((va) =>

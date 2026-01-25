@@ -47,7 +47,7 @@ export const isUsedFilter = (
 
 // returns true when this filter has *selected* options and the filter's name
 // equals the given filterName
-export const isUsedFilter2 = (
+export const isFilterValueUsed = (
   key: string,
   filterValue: DataTableFiltersValue,
   filterName: string
