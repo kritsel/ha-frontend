@@ -45,6 +45,18 @@ export const isUsedFilter = (
   return isUsed;
 };
 
+// returns true when this filter has *selected* options and the filter's name
+// equals the given filterName
+export const isUsedFilter2 = (
+  key: string,
+  filterValue: DataTableFiltersValue,
+  filterName: string
+): number | false => {
+  const isUsed =
+    key === filterName && Array.isArray(filterValue) && filterValue.length;
+  return isUsed;
+};
+
 // returns true when this filter has *selected* options
 // which has resulted in a list of items that match these selected opions
 // (this list can be empty),

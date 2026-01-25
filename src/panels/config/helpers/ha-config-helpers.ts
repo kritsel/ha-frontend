@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { ResizeController } from "@lit-labs/observers/resize-controller";
 import { consume } from "@lit/context";
 import {
@@ -73,9 +74,10 @@ import {
 } from "../../../data/config_entries";
 import { getConfigFlowHandlers } from "../../../data/config_flow";
 import { fullEntitiesContext } from "../../../data/context";
-import type {
-  DataTableFiltersItems,
-  DataTableFiltersValues,
+import {
+  isUsedFilter2,
+  type DataTableFiltersItems,
+  type DataTableFiltersValues,
 } from "../../../data/data_table_filters";
 import {
   fetchDiagnosticHandlers,
@@ -961,108 +963,59 @@ export class HaConfigHelpers extends SubscribeMixin(LitElement) {
   private _applyFilters() {
     const filters = Object.entries(this._filters);
 
-    let items: Set<string> | undefined;
+    // let items: Set<string> | undefined;
 
+    // start with ALL items
+    const helperEntityIds = this._helperEntities.map(
+      (helper) => helper.entity_id
+    );
+    const disabledEntityIds = this._disabledEntityEntries
+      ? this._disabledEntityEntries.map((entry) => entry.entity_id)
+      : [];
+    let filteredEntityIds = helperEntityIds.concat(disabledEntityIds);
+
+    console.log("_filteredItems (in _applyFilters)");
+    console.log(this._filteredItems);
+
+    // first process all filters that apply the selected filter values
+    // themselves, and respond with the helper entityIds that match
     Object.values(this._filteredItems).forEach((itms) => {
-      if (!itms) {
-        return;
+      if (itms) {
+        filteredEntityIds = filteredEntityIds.filter((entityId) =>
+          itms!.has(entityId)
+        );
       }
-      if (!items) {
-        items = itms;
-        return;
-      }
-      items =
-        "intersection" in items
-          ? // @ts-ignore
-            items.intersection(itms)
-          : new Set([...items].filter((x) => itms!.has(x)));
     });
 
-    for (const [key, filter] of filters) {
-      if (
-        key === "ha-filter-labels" &&
-        Array.isArray(filter) &&
-        filter.length
-      ) {
-        const labelItems = new Set<string>();
-        this._helperEntities
-          .filter((stateItem) =>
-            entityRegistryByEntityId(this._entityReg)[
-              stateItem.entity_id
-            ]?.labels.some((lbl) => filter.includes(lbl))
-          )
-          .forEach((stateItem) => labelItems.add(stateItem.entity_id));
-        (this._disabledEntityEntries || [])
-          .filter((entry) => entry.labels.some((lbl) => filter.includes(lbl)))
-          .forEach((entry) => labelItems.add(entry.entity_id));
-        if (!items) {
-          items = labelItems;
-          continue;
-        }
-        items =
-          "intersection" in items
-            ? // @ts-ignore
-              items.intersection(labelItems)
-            : new Set([...items].filter((x) => labelItems!.has(x)));
+    // the filters below only expose the selected options (as filter.value);
+    // category filter only allows a single selected option
+    // applying the filter must be done here
+    for (const [key, filterValue] of filters) {
+      if (isUsedFilter2(key, filterValue, "ha-filter-categories")) {
+        // category filter only allows a single selected option
+        filteredEntityIds = filteredEntityIds.filter(
+          (entityId) =>
+            filterValue![0] ===
+            this._entityReg.find((reg) => reg.entity_id === entityId)
+              ?.categories.helpers
+        );
+      } else if (isUsedFilter2(key, filterValue, "ha-filter-labels")) {
+        filteredEntityIds = filteredEntityIds.filter((entityId) =>
+          this._entityReg
+            .find((reg) => reg.entity_id === entityId)
+            ?.labels.some((lbl) => (filterValue as string[]).includes(lbl))
+        );
       } else if (
-        key === "ha-filter-categories" &&
-        Array.isArray(filter) &&
-        filter.length
+        isUsedFilter2(key, filterValue, "ha-filter-voice-assistants")
       ) {
-        const categoryItems = new Set<string>();
-        this._helperEntities
-          .filter(
-            (stateItem) =>
-              filter[0] ===
-              entityRegistryByEntityId(this._entityReg)[stateItem.entity_id]
-                ?.categories.helpers
+        filteredEntityIds = filteredEntityIds.filter((entityId) =>
+          getEntityVoiceAssistantsIds(this._entityReg, entityId).some((va) =>
+            (filterValue as string[]).includes(va)
           )
-          .forEach((stateItem) => categoryItems.add(stateItem.entity_id));
-        (this._disabledEntityEntries || [])
-          .filter((entry) => filter[0] === entry.categories.helpers)
-          .forEach((entry) => categoryItems.add(entry.entity_id));
-        if (!items) {
-          items = categoryItems;
-          continue;
-        }
-        items =
-          "intersection" in items
-            ? // @ts-ignore
-              items.intersection(categoryItems)
-            : new Set([...items].filter((x) => categoryItems!.has(x)));
-      } else if (
-        key === "ha-filter-voice-assistants" &&
-        Array.isArray(filter) &&
-        filter.length
-      ) {
-        const assistItems = new Set<string>();
-        this._helperEntities
-          .filter((stateItem) =>
-            getEntityVoiceAssistantsIds(
-              this._entityReg,
-              stateItem.entity_id
-            ).some((va) => (filter as string[]).includes(va))
-          )
-          .forEach((stateItem) => assistItems.add(stateItem.entity_id));
-        (this._disabledEntityEntries || [])
-          .filter((entry) =>
-            getEntityVoiceAssistantsIds(this._entityReg, entry.entity_id).some(
-              (va) => (filter as string[]).includes(va)
-            )
-          )
-          .forEach((entry) => assistItems.add(entry.entity_id));
-        if (!items) {
-          items = assistItems;
-          continue;
-        }
-        items =
-          "intersection" in items
-            ? // @ts-ignore
-              items.intersection(assistItems)
-            : new Set([...items].filter((x) => assistItems!.has(x)));
+        );
       }
     }
-    this._filteredHelperEntityIds = items ? [...items] : undefined;
+    this._filteredHelperEntityIds = filteredEntityIds;
   }
 
   public connectedCallback() {
