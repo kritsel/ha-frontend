@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { ResizeController } from "@lit-labs/observers/resize-controller";
 import { consume } from "@lit/context";
 import {
@@ -298,6 +299,7 @@ export class HaConfigHelpers extends SubscribeMixin(LitElement) {
               message.entry.state === "loaded" &&
               this._configEntries[message.entry.entry_id]?.state !== "loaded"
             ) {
+              console.log("call _debouncedFetchEntitySources");
               this._debouncedFetchEntitySources();
             }
           });
@@ -523,9 +525,19 @@ export class HaConfigHelpers extends SubscribeMixin(LitElement) {
       labelReg?: LabelRegistryEntry[],
       filteredStateItems?: string[] | null
     ): HelperItem[] => {
+      console.log("*** _getItems");
       if (filteredStateItems === null) {
         return [];
       }
+
+      console.log("stateItems (in _getItems)");
+      console.log(stateItems);
+      console.log("3. disabledEntries (in _getItems)");
+      console.log(disabledEntries);
+      console.log("configEntries (in _getItems)");
+      console.log(configEntries);
+      console.log("filteredStateItems (in _getItems)");
+      console.log(filteredStateItems);
 
       const configEntriesCopy = { ...configEntries };
 
@@ -555,6 +567,12 @@ export class HaConfigHelpers extends SubscribeMixin(LitElement) {
         };
       });
 
+      console.log("1, stateItems -> states (in_getItems)");
+      console.log(states);
+
+      console.log("configEntries -> configEntriesCopy (in _getItems)");
+      console.log(configEntriesCopy);
+
       const entries = Object.values(configEntriesCopy)
         .map((configEntry) => {
           const entityEntry = Object.values(entityEntries).find(
@@ -577,6 +595,9 @@ export class HaConfigHelpers extends SubscribeMixin(LitElement) {
           };
         })
         .filter((e) => !e.disabled);
+
+      console.log("2. configEntriesCopy -> entries (in _getItems)");
+      console.log(entries);
 
       const disabledItems = (disabledEntries || []).map((e) => ({
         id: e.entity_id,
@@ -644,6 +665,7 @@ export class HaConfigHelpers extends SubscribeMixin(LitElement) {
   }
 
   protected render(): TemplateResult {
+    console.log("*** render");
     if (
       !this.hass ||
       this._helperEntities === undefined ||
@@ -944,6 +966,7 @@ export class HaConfigHelpers extends SubscribeMixin(LitElement) {
   }
 
   private _filterExpanded(ev) {
+    console.log("*** _filterExpanded");
     if (ev.detail.expanded) {
       this._expandedFilter = ev.target.localName;
     } else if (this._expandedFilter === ev.target.localName) {
@@ -952,6 +975,7 @@ export class HaConfigHelpers extends SubscribeMixin(LitElement) {
   }
 
   private _filterChanged(ev) {
+    console.log("*** _filterChanged");
     const type = ev.target.localName;
 
     this._filters = { ...this._filters, [type]: ev.detail.value };
@@ -960,6 +984,7 @@ export class HaConfigHelpers extends SubscribeMixin(LitElement) {
   }
 
   private _applyFilters() {
+    console.log("*** _applyFilters");
     let filteredEntityIds: string[] | undefined;
 
     // first process all filters that apply the selected filter values
@@ -976,15 +1001,24 @@ export class HaConfigHelpers extends SubscribeMixin(LitElement) {
       }
     });
 
-    // when none of those filters were used, then initalize the filter result
-    // with all helper entityIds
-    const helperEntityIds = this._helperEntities.map(
-      (helper) => helper.entity_id
-    );
-    const disabledEntityIds = this._disabledEntityEntries
-      ? this._disabledEntityEntries.map((entry) => entry.entity_id)
-      : [];
-    filteredEntityIds = helperEntityIds.concat(disabledEntityIds);
+    if (!filteredEntityIds) {
+      // when none of those filters were used, then initalize the filter result
+      // with all helper entityIds
+      const helperEntityIds = this._helperEntities.map(
+        (helper) => helper.entity_id
+      );
+      console.log("this._helperEntities");
+      console.log(this._helperEntities);
+      console.log("this._disabledEntityEntries");
+      console.log(this._disabledEntityEntries);
+      const disabledEntityIds = this._disabledEntityEntries
+        ? this._disabledEntityEntries.map((entry) => entry.entity_id)
+        : [];
+      filteredEntityIds = helperEntityIds.concat(disabledEntityIds);
+    }
+
+    console.log("filteredEntityIds");
+    console.log(filteredEntityIds);
 
     // the filters below only expose the selected options (as filter.value);
     // category filter only allows a single selected option
@@ -1015,6 +1049,8 @@ export class HaConfigHelpers extends SubscribeMixin(LitElement) {
         );
       }
     }
+    console.log("filters -> _this.filteredHelperEntityIds");
+    console.log(this._filteredHelperEntityIds);
     this._filteredHelperEntityIds = filteredEntityIds;
   }
 
@@ -1065,6 +1101,7 @@ export class HaConfigHelpers extends SubscribeMixin(LitElement) {
   }
 
   private _clearFilter() {
+    console.log("*** _clearFilter");
     this._filters = {};
     this._filteredItems = {};
     this._applyFilters();
@@ -1163,6 +1200,7 @@ ${rejected
   }
 
   protected firstUpdated(changedProps: PropertyValues) {
+    console.log("*** firstupdated");
     super.firstUpdated(changedProps);
     this._setFiltersFromUrl();
     this._fetchEntitySources();
@@ -1183,10 +1221,16 @@ ${rejected
   }
 
   private async _fetchEntitySources() {
+    console.log("*** _fetchEntitySources");
     const [entitySources, fetchedManifests] = await Promise.all([
       fetchEntitySourcesWithCache(this.hass),
       fetchIntegrationManifests(this.hass),
     ]);
+
+    console.log("entitySources (in _fetchEntitySources)");
+    console.log(entitySources);
+    console.log("fetchedManifests (in _fetchEntitySources)");
+    console.log(fetchedManifests);
 
     const manifests: Record<string, IntegrationManifest> = {};
 
@@ -1215,6 +1259,10 @@ ${rejected
     }
 
     this._entitySource = entityDomains;
+    console.log(
+      "entitySources + fetchedManifests -> this._entitySource (in _fetchEntitySources)"
+    );
+    console.log(this._entitySource);
   }
 
   private async _handleAdd() {
@@ -1276,6 +1324,7 @@ ${rejected
 
   protected willUpdate(changedProps: PropertyValues) {
     super.willUpdate(changedProps);
+    console.log("*** willUpdate");
 
     if (!this.hasUpdated) {
       this._setFiltersFromUrl();
@@ -1314,18 +1363,29 @@ ${rejected
     }
 
     const entityIds = Object.keys(this._entitySource);
+    console.log("this._entitySource (in willUpdate)");
+    console.log(this._entitySource);
+    console.log("this._entitySource -> entityIds (in willUpdate)");
+    console.log(entityIds);
+    console.log(this._entitySource);
 
     const newHelpers = Object.values(this.hass!.states).filter(
       (entity) =>
         entityIds.includes(entity.entity_id) ||
         isHelperDomain(computeStateDomain(entity))
     );
+    console.log(
+      "this.hass!.states + (entityIds || helper) -> newHelpers (in willUpdate)"
+    );
+    console.log(newHelpers);
 
     if (
       this._helperEntities.length !== newHelpers.length ||
       !this._helperEntities.every((val, idx) => newHelpers[idx] === val)
     ) {
       this._helperEntities = newHelpers;
+      console.log("newHelpers -> this._helperEntities (in willUpdate)");
+      console.log(this._helperEntities);
     }
   }
 
